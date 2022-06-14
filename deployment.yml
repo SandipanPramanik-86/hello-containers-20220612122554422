@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: springboot-app
+  name: hello-app
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: springboot-app
+      app: hello-app
   template:
     metadata:
       labels:
-        app: springboot-app
+        app: hello-app
     spec:
       containers:
-      - name: springboot-app
-        image: springbootapp:1
+      - name: hello-app
+        image: webapp:1
         # for local development against minikube registry
         #imagePullPolicy: Never        
         ports:
@@ -30,9 +30,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: springboot-service
+  name: hello-service
   labels:
-    app: springboot-service
+    app: hello-service
 spec:
   type: NodePort
   ports:
@@ -41,14 +41,14 @@ spec:
       targetPort: 8080
   # label keys and values that must match in order to receive traffic for this service
   selector:
-    app: springboot-app
+    app: hello-app
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: hello-service-cip
   labels:
-    app: springboot-app
+    app: hello-app
 spec:
   type: ClusterIP
   ports:
@@ -57,25 +57,25 @@ spec:
       targetPort: 8080
   # label keys and values that must match in order to receive traffic for this service
   selector:
-    app: springboot-app
+    app: hello-app
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: springboot-ingress
+  name: hello-ingress
 spec:
   rules:
-  - host: springboot-app.cluster-ingress-subdomain
+  - host: hello-app.cluster-ingress-subdomain
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: springboot-service-cip
+            name: hello-service-cip
             port:
               number: 80
   tls:
   - hosts:
-    - springboot.cluster-ingress-subdomain
+    - hello-app.cluster-ingress-subdomain
     secretName: cluster-ingress-secret
